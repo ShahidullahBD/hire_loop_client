@@ -14,8 +14,8 @@ import logo from '../../public/images/logo.png';
 
 const navLinks = [
   { label: "Browse Jobs", href: "/jobs" },
-  { label: "Company", href: "/company" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "Company", href: "/companies" },
+  { label: "Pricing", href: "/pricing" }  
 ];
 
 export default function Navbar() {
@@ -55,8 +55,15 @@ export default function Navbar() {
               </Link>
             ))}
 
+
             {/* Vertical Divider */}
             <div className="h-8 w-px bg-white/15" />
+            {
+              user &&
+            <div>
+              <Link href="/dashboard"><Button>Dashboard</Button></Link>
+            </div>
+            }
             { isPending? <p>Loading....</p>:
             user ? <>
               <h2>{user.name}</h2>

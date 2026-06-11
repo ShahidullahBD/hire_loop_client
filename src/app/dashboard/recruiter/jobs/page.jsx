@@ -8,6 +8,7 @@ import { getLoggedInRecruiterCompany } from '@/lib/api/companies';
 const RecruiterJobs = async () => {
     const company = await getLoggedInRecruiterCompany();
     const jobs = await getCompanyJobs(company._id) || []; 
+    console.log(jobs, 'jobs');
 
     // Helper to determine status chip coloring
     const getStatusColor = (status) => {
