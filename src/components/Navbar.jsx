@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { use, useState } from "react";
 import { Bars, Xmark } from "@gravity-ui/icons";
 import { Button } from "@heroui/react";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -10,23 +10,39 @@ import Image from "next/image";
 import logo from '../../public/images/logo.png';
 
 
-
-
-const navLinks = [
-  { label: "Browse Jobs", href: "/jobs" },
-  { label: "Company", href: "/companies" },
-  { label: "Pricing", href: "/pricing" }  
-];
-
 export default function Navbar() {
+
   const [isOpen, setIsOpen] = useState(false);
   const { data: session, isPending } = useSession();
   // console.log(session, 'session', isPending);
   const user = session?.user;
-  
-  const handleSignOut = async ()=>{
+  // console.log(user, 'user');
+  // console.log(user?.role, 'role');
+
+  const navLinks = [
+    { label: "Browse Jobs", href: "/jobs" },
+    { label: "Company", href: "/companies" },
+    { label: "Plans", href: "/plans" }
+  ];
+
+  const dashboardLinks = {
+    seeker: '/dashboard/seeker',
+    recruiter: '/dashboard/recruiter',
+    admin: 'dashboard/admin'
+  }
+
+  if (user?.email) {
+    navLinks.push(
+      {
+        label: 'Dashboard',
+        href: dashboardLinks[user?.role || 'seeker']
+      }
+    )
+  }
+
+  const handleSignOut = async () => {
     await signOut();
-    redirect('/')
+    redirect('/auth/signin')
   }
 
   return (
@@ -35,8 +51,8 @@ export default function Navbar() {
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl px-5 lg:px-8 h-20 flex items-center justify-between shadow-[0_0_30px_rgba(0,0,0,0.2)]">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-          <Image className="w-40 h-auto"
-          src={logo} alt="logo" width={50} height={30}/>
+            <Image className="w-40 h-auto"
+              src={logo} alt="logo" width={50} height={30} />
             {/* <span className="text-3xl font-extrabold tracking-tight">
               <span className="text-sky-500">hire</span>
               <span className="text-orange-500">loop</span>
@@ -58,23 +74,17 @@ export default function Navbar() {
 
             {/* Vertical Divider */}
             <div className="h-8 w-px bg-white/15" />
-            {
-              user &&
-            <div>
-              <Link href="/dashboard"><Button>Dashboard</Button></Link>
-            </div>
-            }
-            { isPending? <p>Loading....</p>:
-            user ? <>
-              <h2>{user.name}</h2>
-              <Button variant="ghost" onClick={handleSignOut}>SignOut</Button>
-            </> :
-              <Link
-                href="/auth/signin"
-                className="text-indigo-400 hover:text-indigo-300 font-medium transition"
-              >
-                Sign In
-              </Link>
+            {isPending ? <p>Loading....</p> :
+              user ? <>
+                <h2>{user.name}</h2>
+                <Button variant="ghost" onClick={handleSignOut}>SignOut</Button>
+              </> :
+                <Link
+                  href="/auth/signin"
+                  className="text-indigo-400 hover:text-indigo-300 font-medium transition"
+                >
+                  Sign In
+                </Link>
             }
             <Link href="/auth/signup">
               <Button className="bg-linear-to-r from-indigo-600 to-violet-500 text-white font-semibold px-7 btn">

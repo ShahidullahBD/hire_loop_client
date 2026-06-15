@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, TextField, Label, Input, Button, Radio, RadioGroup } from "@heroui/react";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
@@ -14,12 +14,15 @@ export default function SignupPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: "",
-    role: "seeker",
+    password: "",    
   });
+  const [role, setRole] = useState("seeker");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -54,13 +57,15 @@ export default function SignupPage() {
     e.preventDefault();
     if (!validateForm()) return;
     setIsLoading(true);
+    
+    const plan = role === 'seeker' ? 'seeker_free' : 'recruiter_free';
 
     const { data, error } = await authClient.signUp.email({
       email: formData.email,
       password: formData.password,
       name: formData.name,
-      role: formData.role,
-      callbackURL: "/",
+      role,
+      plan      
     });
 
     setIsLoading(false);
@@ -68,10 +73,10 @@ export default function SignupPage() {
       toast.error(error.message);
     } else {
       toast.success("Account created successfully!");
-      setTimeout(() => router.push("/"), 1500);
+      router.push(redirectTo);
     }
   };
-  console.log(formData, 'formData');
+  // console.log(formData, 'formData');
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4 text-white">
@@ -164,10 +169,11 @@ export default function SignupPage() {
             <RadioGroup defaultValue="seeker" name="role"
               value={formData.role}
               onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  role: value,
-                }))
+                // setFormData((prev) => ({
+                //   ...prev,
+                //   role: value,
+                // }))
+                setRole(value)
               }
               orientation="horizontal"
             >
@@ -203,7 +209,7 @@ export default function SignupPage() {
 
         <div className="text-center text-sm text-zinc-400">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-blue-500 hover:underline">
+          <Link href={`/auth/signin?redirect=${redirectTo}`} className="font-semibold text-blue-500 hover:underline">
             Log In
           </Link>
         </div>

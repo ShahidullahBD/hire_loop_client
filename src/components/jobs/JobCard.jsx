@@ -31,14 +31,19 @@ const JobCard = ({ job }) => {
       <Card.Header className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="relative h-14 w-14 overflow-hidden rounded-xl border bg-white">
-            <Image
-              src={job.companyLogo}
-              alt={job.companyName}
-              fill
-              className="object-contain p-2"
-            />
+            {job.companyLogo ? (
+              <Image
+                src={job.companyLogo}
+                alt={job.companyName}
+                fill
+                className="object-contain p-2"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-gray-500">
+                {job.companyName?.charAt(0)}
+              </div>
+            )}
           </div>
-
           <div>
             <h3 className="font-semibold text-lg">
               {job.companyName}
@@ -69,7 +74,7 @@ const JobCard = ({ job }) => {
         <div className="flex flex-wrap gap-2">
           <Chip
             variant="bordered"
-            // startContent={<Briefcase size={14} />}
+          // startContent={<Briefcase size={14} />}
           >
             {job.jobType}
           </Chip>
@@ -112,8 +117,8 @@ const JobCard = ({ job }) => {
           View Details
         </Link>
 
-        <Link          
-          href={`/jobs/${job._id}`}
+        <Link
+          href={`/jobs/${job._id}/apply`}
           color="primary"
           className="flex-1"
         >

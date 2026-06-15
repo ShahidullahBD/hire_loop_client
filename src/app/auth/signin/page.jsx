@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, TextField, Label, Input, Button } from "@heroui/react";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
@@ -10,6 +10,10 @@ import { authClient } from "@/lib/auth-client";
 
 export default function SigninPage() {
   const router = useRouter();
+  
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -49,8 +53,7 @@ export default function SigninPage() {
     // Better Auth sign-in implementation
     const { data, error } = await authClient.signIn.email({
       email: formData.email,
-      password: formData.password,
-      callbackURL: "/", // Redirects to home page on success
+      password: formData.password,      
     });
 
     setIsLoading(false);
@@ -59,9 +62,7 @@ export default function SigninPage() {
       toast.error(error.message || "Invalid email or password.");
     } else {
       toast.success("Welcome back! Redirecting...");
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
+      router.push(redirectTo);
     }
   };
 
@@ -129,7 +130,7 @@ export default function SigninPage() {
 
         <div className="text-center text-sm text-zinc-400">
           New to Hire Loop?{" "}
-          <Link href="/signup" className="font-semibold text-blue-500 hover:underline">
+          <Link href={`/auth/signup?redirect=${redirectTo}`} className="font-semibold text-blue-500 hover:underline">
             Sign Up
           </Link>
         </div>
